@@ -5,39 +5,54 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.databinding.ActivityCharacterDetailBinding
 import com.esgomez.rickandmorty.adapters.EpisodeListAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.api.EpisodeRequest
-import com.esgomez.rickandmorty.api.EpisodeService
-import com.esgomez.rickandmorty.api.toCharacterEntity
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
-import com.esgomez.rickandmorty.database.CharacterEntity
+import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation
+import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation.*
+import com.esgomez.rickandmorty.presentation.utils.Event
+import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel
 import com.esgomez.rickandmorty.utils.Constants
 import com.esgomez.rickandmorty.utils.bindCircularImageUrl
+import com.esgomez.rickandmorty.utils.getViewModel
 import com.esgomez.rickandmorty.utils.showLongToast
-import io.reactivex.Maybe
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_character_detail.*
 
 class CharacterDetailActivity: AppCompatActivity() {
 
     //region Fields
 
-    private val disposable = CompositeDisposable()
-
     private lateinit var episodeListAdapter: EpisodeListAdapter
     private lateinit var binding: ActivityCharacterDetailBinding
-    private lateinit var episodeRequest: EpisodeRequest
-    private lateinit var characterDao: CharacterDao
+    //Paso 19: Modificar la inicialización de la variable "episodeRequest" usando la función lazy
+    private val episodeRequest: EpisodeRequest by lazy {
+        EpisodeRequest(BASE_API_URL)//Inicializamos el EpisodeRequest con la BASE_API_URL
+    }
 
-    private var character: CharacterServer? = null
+    //Paso 20: Modificar la inicialización de la variable "characterDao" usando la función lazy
+    private val characterDao: CharacterDao by lazy {
+        CharacterDatabase.getDatabase(application).characterDao()
+    }
+
+    //Paso 21: Crear la variable "characterDetailViewModel" de tipo CharacterDetailViewModel usando la función lazy
+    private val characterDetailViewModel: CharacterDetailViewModel by lazy {
+        getViewModel {
+            CharacterDetailViewModel(
+                //Paso 22: Agregar parámetro "intent.getParcelableExtra(Constants.EXTRA_CHARACTER)"
+                intent.getParcelableExtra(Constants.EXTRA_CHARACTER),
+                //Paso 23: Agregar parámetro "characterDao"
+                characterDao,
+                //Paso 24: Agregar parámetro "episodeRequest"
+                episodeRequest
+            )
+        }
+    }
 
     //endregion
 
@@ -54,38 +69,18 @@ class CharacterDetailActivity: AppCompatActivity() {
         }
         rvEpisodeList.adapter = episodeListAdapter
 
-        character = intent.getParcelableExtra(Constants.EXTRA_CHARACTER)
-        if(character == null){
-            this@CharacterDetailActivity.showLongToast(R.string.error_no_character_data)
-            finish()
-            return
-        }
+        //Paso 32: Usar el método "onUpdateFavoriteCharacterStatus" implementado en el view model
+        characterFavorite.setOnClickListener { characterDetailViewModel.onUpdateFavoriteCharacterStatus() }
 
-        episodeRequest = EpisodeRequest(BASE_API_URL)
-        characterDao = CharacterDatabase.getDatabase(application).characterDao()
-
-        onValidateFavoriteCharacterStatus()
-
-        binding.characterImage.bindCircularImageUrl(
-            url = character!!.image,
-            placeholder = R.drawable.ic_camera_alt_black,
-            errorPlaceholder = R.drawable.ic_broken_image_black
-        )
-        binding.characterDataName = character!!.name
-        binding.characterDataStatus = character!!.status
-        binding.characterDataSpecies = character!!.species
-        binding.characterDataGender = character!!.gender
-        binding.characterDataOriginName = character!!.origin.name
-        binding.characterDataLocationName = character!!.location.name
-
-        onShowEpisodeList(character!!.episodeList)
-
-        characterFavorite.setOnClickListener { onUpdateFavoriteCharacterStatus() }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.clear()
+        //Nota: Para trabajar el resultado de cada observer se sugiere llamar al método mediante referencia (Ejemplo -> this::callMethod)
+        //Paso 33: Implementar el método observer del LiveData implementado en el Paso 3 y trabajar el resultado del observer en el método "loadCharacter"
+        characterDetailViewModel.characterValues.observe(this, Observer (this::loadCharacter))
+        //Paso 34: Implementar el método observer del LiveData implementado en el Paso 4 y trabajar el resultado del observer en el método "updateFavoriteIcon"
+        characterDetailViewModel.isFavorite.observe(this, Observer (this::updateFavoriteIcon))
+        //Paso 35: Implementar el método observer del LiveData implementado en el Paso 5 y trabajar el resultado del observer en el método "validateEvents"
+        characterDetailViewModel.event.observe(this, Observer (this::validateEvents))
+        //Paso 36: Usar el método "onCharacterValidation" implementado en el view model
+        characterDetailViewModel.onCharacterValidation()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -101,68 +96,19 @@ class CharacterDetailActivity: AppCompatActivity() {
 
     //region Private Methods
 
-    private fun onValidateFavoriteCharacterStatus(){
-        disposable.add(
-            characterDao.getCharacterById(character!!.id)
-                .isEmpty
-                .flatMapMaybe { isEmpty ->
-                    Maybe.just(!isEmpty)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe { isFavorite ->
-                    updateFavoriteIcon(isFavorite)
-                }
+    //Paso 41: Inicializar los valores de la variable "binding" utilizando de referencia el paso 30
+    private fun loadCharacter(character: CharacterServer){
+        binding.characterImage.bindCircularImageUrl(
+            url = character!!.image,
+            placeholder = R.drawable.ic_camera_alt_black,
+            errorPlaceholder = R.drawable.ic_broken_image_black
         )
-    }
-
-    private fun onShowEpisodeList(episodeUrlList: List<String>){
-        disposable.add(
-            Observable.fromIterable(episodeUrlList)
-                .flatMap { episode: String ->
-                    episodeRequest.baseUrl = episode
-                    episodeRequest
-                        .getService<EpisodeService>()
-                        .getEpisode()
-                        .toObservable()
-                }
-                .toList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    episodeProgressBar.isVisible = true
-                }
-                .subscribe(
-                    { episodeList ->
-                        episodeProgressBar.isVisible = false
-                        episodeListAdapter.updateData(episodeList)
-                    },
-                    { error ->
-                        episodeProgressBar.isVisible = false
-                        this@CharacterDetailActivity.showLongToast("Error -> ${error.message}")
-                    })
-        )
-    }
-
-    private fun onUpdateFavoriteCharacterStatus() {
-        val characterEntity: CharacterEntity = character!!.toCharacterEntity()
-        disposable.add(
-            characterDao.getCharacterById(characterEntity.id)
-                .isEmpty
-                .flatMapMaybe { isEmpty ->
-                    if(isEmpty){
-                        characterDao.insertCharacter(characterEntity)
-                    }else{
-                        characterDao.deleteCharacter(characterEntity)
-                    }
-                    Maybe.just(isEmpty)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe { isFavorite ->
-                    updateFavoriteIcon(isFavorite)
-                }
-        )
+        binding.characterDataName = character!!.name
+        binding.characterDataStatus = character!!.status
+        binding.characterDataSpecies = character!!.species
+        binding.characterDataGender = character!!.gender
+        binding.characterDataOriginName = character!!.origin.name
+        binding.characterDataLocationName = character!!.location.name
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean?){
@@ -174,6 +120,30 @@ class CharacterDetailActivity: AppCompatActivity() {
             }
         )
     }
+
+    private fun validateEvents(event: Event<CharacterDetailNavigation>?) {
+        event?.getContentIfNotHandled()?.let { navigation ->
+            when (navigation) {
+                is ShowEpisodeError -> navigation.run {
+                    this@CharacterDetailActivity.showLongToast("Error -> ${error.message}")
+                }
+                is ShowEpisodeList -> navigation.run {
+                    episodeListAdapter.updateData(episodeList)
+                }
+                CloseActivity -> {
+                    this@CharacterDetailActivity.showLongToast(R.string.error_no_character_data)
+                    finish()
+                }
+                HideEpisodeListLoading -> {
+                    episodeProgressBar.isVisible = false
+                }
+                ShowEpisodeListLoading -> {
+                    episodeProgressBar.isVisible = true
+                }
+            }
+        }
+    }
+
 
     //endregion
 }
