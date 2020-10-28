@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.esgomez.rickandmorty.api.*
@@ -14,11 +15,9 @@ import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.CharacterGridAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
+import com.esgomez.rickandmorty.presentation.CharacterListViewModel
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import com.esgomez.rickandmorty.utils.showLongToast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_character_list.*
 
 
@@ -26,15 +25,14 @@ class CharacterListFragment : Fragment() {
 
     //region Fields
 
-    private val disposable = CompositeDisposable()
-
     private lateinit var characterGridAdapter: CharacterGridAdapter
     private lateinit var listener: OnCharacterListFragmentListener
     private lateinit var characterRequest: CharacterRequest
 
-    private var currentPage = 1
-    private var isLastPage = false
-    private var isLoading = false
+    //Intanciamos la clase CharacterListViewModel
+    private val characterListViewModel: CharacterListViewModel by lazy {//Lo inicalizamos como tipo lazy
+        CharacterListViewModel(characterRequest)
+    }
 
     private val onScrollListener: RecyclerView.OnScrollListener by lazy {
         object: RecyclerView.OnScrollListener() {
@@ -46,7 +44,7 @@ class CharacterListFragment : Fragment() {
                 val totalItemCount: Int = layoutManager.itemCount
                 val firstVisibleItemPosition: Int = layoutManager.findFirstVisibleItemPosition()
 
-                onLoadMoreItems(visibleItemCount, firstVisibleItemPosition, totalItemCount)
+                characterListViewModel.onLoadMoreItems(visibleItemCount, firstVisibleItemPosition, totalItemCount)
             }
         }
     }
@@ -98,75 +96,31 @@ class CharacterListFragment : Fragment() {
         }
 
         srwCharacterList.setOnRefreshListener {
-            onRetryGetAllCharacter(rvCharacterList.adapter?.itemCount ?: 0)
+            characterListViewModel.onRetryGetAllCharacter(rvCharacterList.adapter?.itemCount ?: 0)
         }
 
-        onGetAllCharacters()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.clear()
-    }
-
-    //endregion
-
-    //region Private Methods
-
-    private fun onLoadMoreItems(visibleItemCount: Int, firstVisibleItemPosition: Int, totalItemCount: Int) {
-        if (isLoading || isLastPage || !isInFooter(visibleItemCount, firstVisibleItemPosition, totalItemCount)) {
-            return
-        }
-
-        currentPage += 1
-        onGetAllCharacters()
-    }
-
-    private fun isInFooter(
-        visibleItemCount: Int,
-        firstVisibleItemPosition: Int,
-        totalItemCount: Int
-    ): Boolean {
-        return visibleItemCount + firstVisibleItemPosition >= totalItemCount
-                && firstVisibleItemPosition >= 0
-                && totalItemCount >= PAGE_SIZE
-    }
-
-    private fun onRetryGetAllCharacter(itemCount: Int) {
-        if (itemCount > 0) {
-            srwCharacterList.isRefreshing = false
-            return
-        }
-
-        onGetAllCharacters()
-    }
-
-    private fun onGetAllCharacters(){
-        disposable.add(
-            characterRequest
-                .getService<CharacterService>()
-                .getAllCharacters(currentPage)
-                .map(CharacterResponseServer::toCharacterServerList)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    srwCharacterList.isRefreshing = true
-                }
-                .subscribe({ characterList ->
-                    if (characterList.size < PAGE_SIZE) {
-                        isLastPage = true
+        characterListViewModel.event.observe(this, Observer { events ->
+            events?.getContentIfNotHandled()?.let { navigation ->
+                when (navigation) {
+                    is CharacterListViewModel.CharacterListNavigation.ShowCharacterError -> {
+                        context?.showLongToast("Error")//Cuando es un mostramos un Toast
                     }
-
-                    srwCharacterList.isRefreshing = false
-                    characterGridAdapter.addData(characterList)
-                }, { error ->
-                    isLastPage = true
-                    srwCharacterList.isRefreshing = false
-                    context?.showLongToast("Error -> ${error.message}")
-                })
-        )
+                    is CharacterListViewModel.CharacterListNavigation.ShowCharacterList -> navigation.run {//Cuando es un listado cargamos la lista
+                        characterGridAdapter.addData(characterListt)//Para poder trabajar con el characterListt agregamos el navigation.run
+                    }
+                    //Los siguientes elementos no reciben parametros
+                    CharacterListViewModel.CharacterListNavigation.HideLoading -> {
+                        srwCharacterList.isRefreshing = false//hacemos que se oculte el progres
+                    }
+                    CharacterListViewModel.CharacterListNavigation.ShowLoading -> {
+                        srwCharacterList.isRefreshing = true//hacemos que se muestre el progres
+                    }
+                }
+            }
+        })
+        //Escuchamos los eventos
+        characterListViewModel.onGetAllCharacters()//Llamamos a los personajes
     }
-
     //endregion
 
     //region Inner Classes & Interfaces
