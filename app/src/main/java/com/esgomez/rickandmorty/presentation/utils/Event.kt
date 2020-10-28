@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.presentation
+package com.esgomez.rickandmorty.presentation.utils
 
 data class Event <out T>(private val content: T) {
 

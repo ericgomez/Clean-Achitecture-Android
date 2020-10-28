@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.FavoriteListAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
@@ -16,6 +17,7 @@ import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.databinding.FragmentFavoriteListBinding
+import com.esgomez.rickandmorty.presentation.FavoriteListViewModel
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -26,12 +28,14 @@ class FavoriteListFragment : Fragment() {
 
     //region Fields
 
-    private val disposable = CompositeDisposable()
-
     private lateinit var favoriteListAdapter: FavoriteListAdapter
     private lateinit var listener: OnFavoriteListFragmentListener
     private lateinit var characterRequest: CharacterRequest
     private lateinit var characterDao: CharacterDao
+
+    private val favoriteListViewModel: FavoriteListViewModel by lazy {
+        FavoriteListViewModel(characterDao)//Le pasamos el caracter dao
+    }
 
     //endregion
 
@@ -77,33 +81,23 @@ class FavoriteListFragment : Fragment() {
             setItemDecorationSpacing(resources.getDimension(R.dimen.list_item_padding))
             adapter = favoriteListAdapter
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
-
-        disposable.add(
-            characterDao.getAllFavoriteCharacters()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({ characterList ->
-                    if(characterList.isEmpty()) {
-                        tvEmptyListMessage.isVisible = true
-                        favoriteListAdapter.updateData(emptyList())
-                    } else {
+        favoriteListViewModel.favoriteCharacterList.observe(this, Observer (favoriteListViewModel::onFavoriteCharacterList))
+        //Lo que obtengamos de favoriteListViewModel lo vamos a volver a volver a mandar al ViewModel para que valide en contenido
+        favoriteListViewModel.event.observe(this, Observer { events ->
+            events?.getContentIfNotHandled()?.let { navigation ->
+                when(navigation) {
+                    is FavoriteListViewModel.FavoriteListNavigation.ShowCharacterList -> navigation.run {//En caso de que tenga que mostrar informacion
                         tvEmptyListMessage.isVisible = false
                         favoriteListAdapter.updateData(characterList)
                     }
-                },{
-                    tvEmptyListMessage.isVisible = true
-                    favoriteListAdapter.updateData(emptyList())
-                })
-        )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.clear()
+                    FavoriteListViewModel.FavoriteListNavigation.ShowEmptyListMessage -> {
+                        tvEmptyListMessage.isVisible = true
+                        favoriteListAdapter.updateData(emptyList())
+                    }
+                }
+            }
+        })
     }
 
     //endregion
