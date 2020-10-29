@@ -8,16 +8,16 @@ import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
-import io.reactivex.Maybe
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
+import com.esgomez.rickandmorty.usecases.UpdateFavoriteCharacterStatusUseCase
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 
 // Paso 1: Pasar como parámetros "character" de tipo CharacterServer?, "characterDao" de tipo CharacterDao y "episodeRequest" de tipo EpisodeRequest
 class CharacterDetailViewModel(
     private val character: CharacterServer? = null,
-    private val characterDao: CharacterDao,
-    private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase
+    private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase,
+    private val getFavoriteCharacterStatusUseCase: GetFavoriteCharacterStatusUseCase,
+    private val updateFavoriteCharacterStatusUseCase: UpdateFavoriteCharacterStatusUseCase
 ) : ViewModel() {
 
     //region Fields
@@ -65,18 +65,8 @@ class CharacterDetailViewModel(
     fun onUpdateFavoriteCharacterStatus() {
         val characterEntity: CharacterEntity = character!!.toCharacterEntity()
         disposable.add(
-            characterDao.getCharacterById(characterEntity.id)
-                .isEmpty
-                .flatMapMaybe { isEmpty ->
-                    if(isEmpty){
-                        characterDao.insertCharacter(characterEntity)
-                    }else{
-                        characterDao.deleteCharacter(characterEntity)
-                    }
-                    Maybe.just(isEmpty)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+            updateFavoriteCharacterStatusUseCase//Implementar variable "updateFavoriteCharacterStatusUseCase"
+                .invoke(characterEntity)//Pasar la variable "characterEntity" al método "invoke" del caso de uso
                 .subscribe { isFavorite ->
                     //Paso 11: Disparar la variable de tipo MutableLiveData que se implementó en el Paso 3 con la variable "isFavorite"
                     _isFavorite.value = isFavorite//Devuelve la peticion
@@ -90,13 +80,8 @@ class CharacterDetailViewModel(
 
     private fun validateFavoriteCharacterStatus(characterId: Int){
         disposable.add(
-            characterDao.getCharacterById(characterId)
-                .isEmpty
-                .flatMapMaybe { isEmpty ->
-                    Maybe.just(!isEmpty)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+            getFavoriteCharacterStatusUseCase//Implementar variable "getFavoriteCharacterStatusUseCase"
+                .invoke(characterId)//Pasar la variable "characterId" al método "invoke" del caso de uso
                 .subscribe { isFavorite ->
                     //Paso 12: Disparar la variable de tipo MutableLiveData que se implementó en el Paso 3 con la variable "isFavorite"
                     _isFavorite.value = isFavorite//Devuelve la peticion

@@ -19,6 +19,8 @@ import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterD
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel
 import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
+import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
+import com.esgomez.rickandmorty.usecases.UpdateFavoriteCharacterStatusUseCase
 import com.esgomez.rickandmorty.utils.Constants
 import com.esgomez.rickandmorty.utils.bindCircularImageUrl
 import com.esgomez.rickandmorty.utils.getViewModel
@@ -45,6 +47,17 @@ class CharacterDetailActivity: AppCompatActivity() {
         GetEpisodeFromCharacterUseCase(episodeRequest)//Generamos la instancia de GetEpisodeFromCharacterUseCase y le enviamos episodeRequest
     }
 
+    //Paso 12: Crear la variable getFavoriteCharacterStatusUseCase de tipo GetFavoriteCharacterStatusUseCase usando la función lazy
+    //Paso 12.1: Para como parámetro characterDao
+    private val getFavoriteCharacterStatusUseCase: GetFavoriteCharacterStatusUseCase by lazy {
+        GetFavoriteCharacterStatusUseCase(characterDao)
+    }
+    //Paso 13: Crear la variable updateFavoriteCharacterStatusUseCase de tipo UpdateFavoriteCharacterStatusUseCase usando la función lazy
+    //Paso 13.1: Para como parámetro characterDao
+    private val updateFavoriteCharacterStatusUseCase: UpdateFavoriteCharacterStatusUseCase by lazy {
+        UpdateFavoriteCharacterStatusUseCase(characterDao)//characterDao es la fuente de datos
+    }
+
     //Paso 21: Crear la variable "characterDetailViewModel" de tipo CharacterDetailViewModel usando la función lazy
     private val characterDetailViewModel: CharacterDetailViewModel by lazy {
         getViewModel {
@@ -52,9 +65,12 @@ class CharacterDetailActivity: AppCompatActivity() {
                 //Paso 22: Agregar parámetro "intent.getParcelableExtra(Constants.EXTRA_CHARACTER)"
                 intent.getParcelableExtra(Constants.EXTRA_CHARACTER),
                 //Paso 23: Agregar parámetro "characterDao"
-                characterDao,
                 //Paso 24: Agregar la funcion que contiene el metodo get de "episodeRequest"
-                getEpisodeFromCharacterUseCase
+                getEpisodeFromCharacterUseCase,
+                //Paso 15: Agregar el caso de uso "getFavoriteCharacterStatusUseCase"
+                //Paso 16: Agregar el caso de uso "updateFavoriteCharacterStatusUseCase"
+                getFavoriteCharacterStatusUseCase,
+                updateFavoriteCharacterStatusUseCase
             )
         }
     }
