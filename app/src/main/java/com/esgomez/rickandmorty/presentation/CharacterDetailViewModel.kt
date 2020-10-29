@@ -7,8 +7,8 @@ import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.presentation.utils.Event
+import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import io.reactivex.Maybe
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers
 class CharacterDetailViewModel(
     private val character: CharacterServer? = null,
     private val characterDao: CharacterDao,
-    private val episodeRequest: EpisodeRequest
+    private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase
 ) : ViewModel() {
 
     //region Fields
@@ -106,17 +106,8 @@ class CharacterDetailViewModel(
 
     private fun requestShowEpisodeList(episodeUrlList: List<String>){
         disposable.add(
-            Observable.fromIterable(episodeUrlList)
-                .flatMap { episode: String ->
-                    episodeRequest.baseUrl = episode
-                    episodeRequest
-                        .getService<EpisodeService>()
-                        .getEpisode()
-                        .toObservable()
-                }
-                .toList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+            getEpisodeFromCharacterUseCase//mandamos llamar a la clase getEpisodeFromCharacterUseCase
+                .invoke(episodeUrlList)//junto con su funcion invoke con la lista de URL
                 .doOnSubscribe {
                     //Paso 13: Disparar el evento de mostrar el progreso de carga de la lista de episodio (Usar CharacterDetailNavigation)
                     _event.value = Event(CharacterDetailNavigation.ShowEpisodeListLoading)

@@ -18,6 +18,7 @@ import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterD
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation.*
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel
+import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import com.esgomez.rickandmorty.utils.Constants
 import com.esgomez.rickandmorty.utils.bindCircularImageUrl
 import com.esgomez.rickandmorty.utils.getViewModel
@@ -40,6 +41,10 @@ class CharacterDetailActivity: AppCompatActivity() {
         CharacterDatabase.getDatabase(application).characterDao()
     }
 
+    private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase by lazy {
+        GetEpisodeFromCharacterUseCase(episodeRequest)//Generamos la instancia de GetEpisodeFromCharacterUseCase y le enviamos episodeRequest
+    }
+
     //Paso 21: Crear la variable "characterDetailViewModel" de tipo CharacterDetailViewModel usando la función lazy
     private val characterDetailViewModel: CharacterDetailViewModel by lazy {
         getViewModel {
@@ -48,8 +53,8 @@ class CharacterDetailActivity: AppCompatActivity() {
                 intent.getParcelableExtra(Constants.EXTRA_CHARACTER),
                 //Paso 23: Agregar parámetro "characterDao"
                 characterDao,
-                //Paso 24: Agregar parámetro "episodeRequest"
-                episodeRequest
+                //Paso 24: Agregar la funcion que contiene el metodo get de "episodeRequest"
+                getEpisodeFromCharacterUseCase
             )
         }
     }

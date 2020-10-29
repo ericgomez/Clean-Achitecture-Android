@@ -5,11 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.presentation.utils.Event
-import io.reactivex.android.schedulers.AndroidSchedulers
+import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 
-class CharacterListViewModel (private val characterRequest: CharacterRequest) : ViewModel() {
+class CharacterListViewModel (private val getAllCharactersUseCase: GetAllCharactersUseCase) : ViewModel() {
 
     private val disposable = CompositeDisposable()
 
@@ -57,33 +56,35 @@ class CharacterListViewModel (private val characterRequest: CharacterRequest) : 
 
     fun onGetAllCharacters(){
         disposable.add(
-            characterRequest
-                .getService<CharacterService>()
-                .getAllCharacters(currentPage)
-                .map(CharacterResponseServer::toCharacterServerList)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe {
-                    _events.value = Event(CharacterListNavigation.ShowLoading)
-                }
+                getAllCharactersUseCase//mandamos llamar a la clase getAllCharactersUseCase
+                .invoke(currentPage)//junto con su funcion invoke
+                .doOnSubscribe { showLoading() }//Mostramos el progres
                 .subscribe({ characterList ->
                     if (characterList.size < PAGE_SIZE) {
                         isLastPage = true
                     }
 
-                    _events.value = Event(CharacterListNavigation.HideLoading)//Ocultamos el progres
+                    hideLoading()//Ocultamos el progres
                     _events.value = Event(CharacterListNavigation.ShowCharacterList(characterList))//Mandamos el listado de personajes
                 }, { error ->
                     isLastPage = true
-                    _events.value = Event(CharacterListNavigation.HideLoading)//Ocultamos el progres
+                    hideLoading()//Ocultamos el progres
                     _events.value = Event(CharacterListNavigation.ShowCharacterError(error))//Mandamos el error
                 })
         )
     }
 
-    companion object {
-        private const val PAGE_SIZE = 20
+    private fun showLoading() {
+        isLoading = true
+        _events.value = Event(CharacterListNavigation.ShowLoading)
     }
+
+    private fun hideLoading() {
+        isLoading = false
+        _events.value = Event(CharacterListNavigation.HideLoading)
+    }
+
+    //endregion
 
     //endregion
 
@@ -91,9 +92,18 @@ class CharacterListViewModel (private val characterRequest: CharacterRequest) : 
     sealed class CharacterListNavigation {
         //Como devuelven parametros son de tipo data class
         data class ShowCharacterError(val error: Throwable) : CharacterListNavigation()//Se va a utilizar en caso de que aya un error al momento de obtener la lista
-        data class ShowCharacterList(val characterListt: List<CharacterServer>) : CharacterListNavigation()//Devolver la lista de personajes
+        data class ShowCharacterList(val characterList: List<CharacterServer>) : CharacterListNavigation()//Devolver la lista de personajes
         //los siguientes elemento no necesitan manejar ningun tipo de parametros por lo que los declararemos como object
         object HideLoading : CharacterListNavigation()//Indica cuando se oculte el proceso de carga de la aplicacion
         object ShowLoading: CharacterListNavigation()////Indica cuando se muestre el proceso de carga de la aplicacion
     }
+
+    //region Companion Object
+
+    companion object {
+
+        private const val PAGE_SIZE = 20
+    }
+
+    //endregion
 }

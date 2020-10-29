@@ -10,12 +10,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.CharacterGridAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
+import com.esgomez.rickandmorty.api.CharacterRequest
+import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel
+import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation
+import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation.*
+import com.esgomez.rickandmorty.presentation.utils.Event
+import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
+import com.esgomez.rickandmorty.utils.getViewModel
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import com.esgomez.rickandmorty.utils.showLongToast
 import kotlinx.android.synthetic.main.fragment_character_list.*
@@ -27,11 +33,18 @@ class CharacterListFragment : Fragment() {
 
     private lateinit var characterGridAdapter: CharacterGridAdapter
     private lateinit var listener: OnCharacterListFragmentListener
-    private lateinit var characterRequest: CharacterRequest
+
+    private val characterRequest: CharacterRequest by lazy {
+        CharacterRequest(BASE_API_URL)
+    }
+
+    private val getAllCharacterUseCase: GetAllCharactersUseCase by lazy {
+        GetAllCharactersUseCase(characterRequest)
+    }
 
     //Intanciamos la clase CharacterListViewModel
     private val characterListViewModel: CharacterListViewModel by lazy {//Lo inicalizamos como tipo lazy
-        CharacterListViewModel(characterRequest)
+        CharacterListViewModel(getAllCharacterUseCase)
     }
 
     private val onScrollListener: RecyclerView.OnScrollListener by lazy {
@@ -67,9 +80,6 @@ class CharacterListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        characterRequest = CharacterRequest(BASE_API_URL)
-
         return DataBindingUtil.inflate<FragmentCharacterListBinding>(
             inflater,
             R.layout.fragment_character_list,
@@ -85,8 +95,10 @@ class CharacterListFragment : Fragment() {
 
         characterGridAdapter = CharacterGridAdapter { character ->
             listener.openCharacterDetail(character)
+        }.also {
+            setHasOptionsMenu(true)
         }
-        characterGridAdapter.setHasStableIds(true)
+        //characterGridAdapter.setHasStableIds(true)
 
         rvCharacterList.run{
             addOnScrollListener(onScrollListener)
@@ -99,28 +111,35 @@ class CharacterListFragment : Fragment() {
             characterListViewModel.onRetryGetAllCharacter(rvCharacterList.adapter?.itemCount ?: 0)
         }
 
-        characterListViewModel.event.observe(this, Observer { events ->
-            events?.getContentIfNotHandled()?.let { navigation ->
-                when (navigation) {
-                    is CharacterListViewModel.CharacterListNavigation.ShowCharacterError -> {
-                        context?.showLongToast("Error")//Cuando es un mostramos un Toast
-                    }
-                    is CharacterListViewModel.CharacterListNavigation.ShowCharacterList -> navigation.run {//Cuando es un listado cargamos la lista
-                        characterGridAdapter.addData(characterListt)//Para poder trabajar con el characterListt agregamos el navigation.run
-                    }
-                    //Los siguientes elementos no reciben parametros
-                    CharacterListViewModel.CharacterListNavigation.HideLoading -> {
-                        srwCharacterList.isRefreshing = false//hacemos que se oculte el progres
-                    }
-                    CharacterListViewModel.CharacterListNavigation.ShowLoading -> {
-                        srwCharacterList.isRefreshing = true//hacemos que se muestre el progres
-                    }
-                }
-            }
-        })
+        characterListViewModel.event.observe(this, Observer(this::validateEvents))//Mandamos llamar al metodo validateEvents
         //Escuchamos los eventos
         characterListViewModel.onGetAllCharacters()//Llamamos a los personajes
     }
+
+    //endregion
+
+    //region Private Methods
+
+    private fun validateEvents(event: Event<CharacterListNavigation>?) {
+        event?.getContentIfNotHandled()?.let { navigation ->
+            when(navigation) {
+                is ShowCharacterError -> navigation.run {
+                    context?.showLongToast("Error -> ${error.message}")//Cuando es un mostramos un Toast
+                }
+                is ShowCharacterList -> navigation.run {//Cuando es un listado cargamos la lista
+                    characterGridAdapter.addData(characterList)//Para poder trabajar con el characterListt agregamos el navigation.run
+                }
+                //Los siguientes elementos no reciben parametros
+                HideLoading -> {
+                    srwCharacterList.isRefreshing = false//hacemos que se oculte el progres
+                }
+                ShowLoading -> {
+                    srwCharacterList.isRefreshing = true//hacemos que se muestre el progres
+                }
+            }
+        }
+    }
+
     //endregion
 
     //region Inner Classes & Interfaces
@@ -134,8 +153,6 @@ class CharacterListFragment : Fragment() {
     //region Companion object
 
     companion object {
-
-        private const val PAGE_SIZE = 20
 
         fun newInstance(args: Bundle? = Bundle()) = CharacterListFragment().apply {
             arguments = args

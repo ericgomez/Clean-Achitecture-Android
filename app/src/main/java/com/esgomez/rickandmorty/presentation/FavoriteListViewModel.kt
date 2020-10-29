@@ -7,10 +7,11 @@ import androidx.lifecycle.ViewModel
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.presentation.utils.Event
+import com.esgomez.rickandmorty.usecases.GetAllFavoriteCharactersUseCase
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class FavoriteListViewModel (private val characterDao: CharacterDao) : ViewModel() {
+class FavoriteListViewModel (private val getAllFavoriteCharactersUseCase: GetAllFavoriteCharactersUseCase) : ViewModel() {
 
     private val disposable = CompositeDisposable()
 
@@ -20,34 +21,12 @@ class FavoriteListViewModel (private val characterDao: CharacterDao) : ViewModel
     //Listado para menejar el listado de personajes favoritos desde la base de datos
     private val _favoriteCharacterList: LiveData<List<CharacterEntity>>
         get() = LiveDataReactiveStreams.fromPublisher(//Nos ayuda a trabajar la informacion cuando aya un cambio en la base de datos
-            characterDao
-                .getAllFavoriteCharacters()//Nos regresa la lista de personajes
-                .onErrorReturn { emptyList() }//Si hay un error que nos regrese una lista vacia
-                .subscribeOn(Schedulers.io())//Indicamos donde se va trabajar esta informacion
+                getAllFavoriteCharactersUseCase//mandamos llamar a la clase getAllFavoriteCharactersUseCase
+                        .invoke()//junto con su funcion invoke
         )
 
     val favoriteCharacterList: LiveData<List<CharacterEntity>>
         get() = _favoriteCharacterList
-
-    /*
-    disposable.add(
-            characterDao.getAllFavoriteCharacters()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({ characterList ->
-                    if(characterList.isEmpty()) {
-                        tvEmptyListMessage.isVisible = true
-                        favoriteListAdapter.updateData(emptyList())
-                    } else {
-                        tvEmptyListMessage.isVisible = false
-                        favoriteListAdapter.updateData(characterList)
-                    }
-                },{
-                    tvEmptyListMessage.isVisible = true
-                    favoriteListAdapter.updateData(emptyList())
-                })
-        )
-    */
 
     override fun onCleared() {
         super.onCleared()

@@ -11,17 +11,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.FavoriteListAdapter
-import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.api.CharacterRequest
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.databinding.FragmentFavoriteListBinding
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel
+import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation
+import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation.ShowCharacterList
+import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation.ShowEmptyListMessage
+import com.esgomez.rickandmorty.presentation.utils.Event
+import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
+import com.esgomez.rickandmorty.usecases.GetAllFavoriteCharactersUseCase
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_favorite_list.*
 
 class FavoriteListFragment : Fragment() {
@@ -31,10 +33,17 @@ class FavoriteListFragment : Fragment() {
     private lateinit var favoriteListAdapter: FavoriteListAdapter
     private lateinit var listener: OnFavoriteListFragmentListener
     private lateinit var characterRequest: CharacterRequest
-    private lateinit var characterDao: CharacterDao
+
+    private val characterDao: CharacterDao by lazy {
+        CharacterDatabase.getDatabase(activity!!.applicationContext).characterDao()
+    }
+
+    private val getAllFavoriteCharactersUseCase: GetAllFavoriteCharactersUseCase by lazy {
+        GetAllFavoriteCharactersUseCase(characterDao)//Le pasamos el caracter dao
+    }
 
     private val favoriteListViewModel: FavoriteListViewModel by lazy {
-        FavoriteListViewModel(characterDao)//Le pasamos el caracter dao
+        FavoriteListViewModel(getAllFavoriteCharactersUseCase)//Le pasamos el caracter getAllFavoriteCharactersUseCase
     }
 
     //endregion
@@ -56,8 +65,8 @@ class FavoriteListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        characterRequest = CharacterRequest(BASE_API_URL)
-        characterDao = CharacterDatabase.getDatabase(activity!!.applicationContext).characterDao()
+        //characterRequest = CharacterRequest(BASE_API_URL)
+        //characterDao = CharacterDatabase.getDatabase(activity!!.applicationContext).characterDao()
 
         return DataBindingUtil.inflate<FragmentFavoriteListBinding>(
             inflater,
@@ -84,25 +93,28 @@ class FavoriteListFragment : Fragment() {
 
         favoriteListViewModel.favoriteCharacterList.observe(this, Observer (favoriteListViewModel::onFavoriteCharacterList))
         //Lo que obtengamos de favoriteListViewModel lo vamos a volver a volver a mandar al ViewModel para que valide en contenido
-        favoriteListViewModel.event.observe(this, Observer { events ->
-            events?.getContentIfNotHandled()?.let { navigation ->
-                when(navigation) {
-                    is FavoriteListViewModel.FavoriteListNavigation.ShowCharacterList -> navigation.run {//En caso de que tenga que mostrar informacion
-                        tvEmptyListMessage.isVisible = false
-                        favoriteListAdapter.updateData(characterList)
-                    }
-                    FavoriteListViewModel.FavoriteListNavigation.ShowEmptyListMessage -> {
-                        tvEmptyListMessage.isVisible = true
-                        favoriteListAdapter.updateData(emptyList())
-                    }
-                }
-            }
-        })
+        favoriteListViewModel.event.observe(this, Observer(this::validateEvents))
+
     }
 
     //endregion
 
     //region Private Methods
+
+    private fun validateEvents(event: Event<FavoriteListNavigation>?) {
+        event?.getContentIfNotHandled()?.let { navigation ->
+            when (navigation) {
+                is ShowCharacterList -> navigation.run {//En caso de que tenga que mostrar informacion
+                    tvEmptyListMessage.isVisible = false
+                    favoriteListAdapter.updateData(characterList)
+                }
+                ShowEmptyListMessage -> {
+                    tvEmptyListMessage.isVisible = true
+                    favoriteListAdapter.updateData(emptyList())
+                }
+            }
+        }
+    }
 
     //endregion
 
