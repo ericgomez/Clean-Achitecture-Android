@@ -3,7 +3,6 @@ package com.esgomez.rickandmorty.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase

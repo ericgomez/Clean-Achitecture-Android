@@ -53,6 +53,8 @@ dependencies {
     implementation project(":domain")
     //Agregamos el proyecto data al proyecto
     implementation project(":data")
+    //Agregamos el proyecto usecases al proyecto
+    implementation project(":usecases")
 
     //Kotlin
     implementation kotlinLib
