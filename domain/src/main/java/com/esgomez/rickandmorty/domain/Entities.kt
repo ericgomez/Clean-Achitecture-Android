@@ -21,3 +21,12 @@ data class Location(
         val name: String,
         val url: String
 )
+
+//Paso 1: Crear entidad de episodio
+data class Episode (
+    //Paso 1.1: Agregar como parámetro "id" de tipo Int
+    //Paso 1.2: Agregar como parámetro "name" de tipo String
+     val id: Int,
+     val name: String
+)
+

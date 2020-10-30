@@ -5,7 +5,7 @@
     <data>
         <variable
             name="episode"
-            type="com.esgomez.rickandmorty.api.EpisodeServer" />
+            type="com.esgomez.rickandmorty.domain.Episode" />
     </data>
 
     <LinearLayout

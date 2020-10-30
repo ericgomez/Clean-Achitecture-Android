@@ -1,9 +1,7 @@
 package com.esgomez.rickandmorty.api
 
-import com.esgomez.rickandmorty.database.CharacterEntity
-import com.esgomez.rickandmorty.database.LocationEntity
-import com.esgomez.rickandmorty.database.OriginEntity
 import com.esgomez.rickandmorty.domain.Character
+import com.esgomez.rickandmorty.domain.Episode
 import com.esgomez.rickandmorty.domain.Location
 import com.esgomez.rickandmorty.domain.Origin
 
@@ -31,4 +29,9 @@ fun OriginServer.toOriginDomain() = Origin(
 fun LocationServer.toLocationDomain() = Location(
     name,
     url
+)
+
+//Paso 8: Crear mapper para cambiar de episodio del servidor a episodio de dominio
+fun EpisodeServer.toEpisodeDomain() = Episode(
+    id, name
 )

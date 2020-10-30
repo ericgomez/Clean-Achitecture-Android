@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.domain.Character
+import com.esgomez.rickandmorty.domain.Episode
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
@@ -117,7 +118,7 @@ class CharacterDetailViewModel(
     //Aqui se encuentran declarados todos los eventos que vamos a disparar
     sealed class CharacterDetailNavigation {
         data class ShowEpisodeError(val error: Throwable) : CharacterDetailNavigation()
-        data class ShowEpisodeList(val episodeList: List<EpisodeServer>) : CharacterDetailNavigation()
+        data class ShowEpisodeList(val episodeList: List<Episode>) : CharacterDetailNavigation()
         object CloseActivity : CharacterDetailNavigation()
         object HideEpisodeListLoading : CharacterDetailNavigation()
         object ShowEpisodeListLoading : CharacterDetailNavigation()
