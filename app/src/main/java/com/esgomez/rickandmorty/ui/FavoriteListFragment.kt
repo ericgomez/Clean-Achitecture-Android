@@ -11,10 +11,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.FavoriteListAdapter
+import com.esgomez.rickandmorty.api.APIConstants
 import com.esgomez.rickandmorty.api.CharacterRequest
+import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
+import com.esgomez.rickandmorty.data.CharacterRepository
+import com.esgomez.rickandmorty.data.LocalCharacterDataSource
+import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterEntity
+import com.esgomez.rickandmorty.database.CharacterRoomDataSource
 import com.esgomez.rickandmorty.databinding.FragmentFavoriteListBinding
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel
@@ -33,14 +39,25 @@ class FavoriteListFragment : Fragment() {
 
     private lateinit var favoriteListAdapter: FavoriteListAdapter
     private lateinit var listener: OnFavoriteListFragmentListener
-    private lateinit var characterRequest: CharacterRequest
 
-    private val characterDao: CharacterDao by lazy {
-        CharacterDatabase.getDatabase(activity!!.applicationContext).characterDao()
+    private val characterRequest: CharacterRequest by lazy {
+        CharacterRequest(APIConstants.BASE_API_URL)
+    }
+
+    private val remoteCharacterDataSource: RemoteCharacterDataSource by lazy {
+        CharacterRetrofitDataSource(characterRequest)
+    }
+
+    private val localCharacterDataSource: LocalCharacterDataSource by lazy {
+        CharacterRoomDataSource(CharacterDatabase.getDatabase(activity!!.applicationContext))
+    }
+
+    private val characterRepository: CharacterRepository by lazy {
+        CharacterRepository(remoteCharacterDataSource, localCharacterDataSource)
     }
 
     private val getAllFavoriteCharactersUseCase: GetAllFavoriteCharactersUseCase by lazy {
-        GetAllFavoriteCharactersUseCase(characterDao)//Le pasamos el caracter dao
+        GetAllFavoriteCharactersUseCase(characterRepository)//Le pasamos el caracter dao
     }
 
     private val favoriteListViewModel: FavoriteListViewModel by lazy {

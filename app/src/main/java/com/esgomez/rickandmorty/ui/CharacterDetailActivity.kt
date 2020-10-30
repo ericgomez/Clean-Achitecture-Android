@@ -10,10 +10,16 @@ import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.databinding.ActivityCharacterDetailBinding
 import com.esgomez.rickandmorty.adapters.EpisodeListAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
+import com.esgomez.rickandmorty.api.CharacterRequest
+import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
 import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.api.EpisodeRequest
+import com.esgomez.rickandmorty.data.CharacterRepository
+import com.esgomez.rickandmorty.data.LocalCharacterDataSource
+import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
+import com.esgomez.rickandmorty.database.CharacterRoomDataSource
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.parcelable.CharacterParcelable
 import com.esgomez.rickandmorty.parcelable.toCharacterDomain
@@ -41,9 +47,20 @@ class CharacterDetailActivity: AppCompatActivity() {
         EpisodeRequest(BASE_API_URL)//Inicializamos el EpisodeRequest con la BASE_API_URL
     }
 
-    //Paso 20: Modificar la inicialización de la variable "characterDao" usando la función lazy
-    private val characterDao: CharacterDao by lazy {
-        CharacterDatabase.getDatabase(application).characterDao()
+    private val characterRequest: CharacterRequest by lazy {
+        CharacterRequest(BASE_API_URL)
+    }
+
+    private val remoteCharacterDataSource: RemoteCharacterDataSource by lazy {
+        CharacterRetrofitDataSource(characterRequest)
+    }
+
+    private val localCharacterDataSource: LocalCharacterDataSource by lazy {
+        CharacterRoomDataSource(CharacterDatabase.getDatabase(applicationContext))
+    }
+
+    private val characterRepository: CharacterRepository by lazy {
+        CharacterRepository(remoteCharacterDataSource, localCharacterDataSource)
     }
 
     private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase by lazy {
@@ -53,12 +70,12 @@ class CharacterDetailActivity: AppCompatActivity() {
     //Paso 12: Crear la variable getFavoriteCharacterStatusUseCase de tipo GetFavoriteCharacterStatusUseCase usando la función lazy
     //Paso 12.1: Para como parámetro characterDao
     private val getFavoriteCharacterStatusUseCase: GetFavoriteCharacterStatusUseCase by lazy {
-        GetFavoriteCharacterStatusUseCase(characterDao)
+        GetFavoriteCharacterStatusUseCase(characterRepository)
     }
     //Paso 13: Crear la variable updateFavoriteCharacterStatusUseCase de tipo UpdateFavoriteCharacterStatusUseCase usando la función lazy
     //Paso 13.1: Para como parámetro characterDao
     private val updateFavoriteCharacterStatusUseCase: UpdateFavoriteCharacterStatusUseCase by lazy {
-        UpdateFavoriteCharacterStatusUseCase(characterDao)//characterDao es la fuente de datos
+        UpdateFavoriteCharacterStatusUseCase(characterRepository)//characterDao es la fuente de datos
     }
 
     //Paso 21: Crear la variable "characterDetailViewModel" de tipo CharacterDetailViewModel usando la función lazy
