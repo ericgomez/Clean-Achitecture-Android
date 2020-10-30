@@ -55,16 +55,14 @@ dependencies {
     implementation project(":data")
     //Agregamos el proyecto usecases al proyecto
     implementation project(":usecases")
+    //Agregamos el proyecto usecases al proyecto
+    implementation project(":framework:imagemanager")
 
     //Kotlin
     implementation kotlinLib
 
     //KTX
     implementation ktxLib
-
-    //Glide
-    implementation glideLib
-    annotationProcessor glideCompiler
 
     //Gson
     implementation gsonLib

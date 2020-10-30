@@ -6,7 +6,7 @@ import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.databinding.ItemGridFavoriteCharacterBinding
 import com.esgomez.rickandmorty.domain.Character
-import com.esgomez.rickandmorty.utils.bindImageUrl
+import com.esgomez.rickandmorty.imagemanager.bindImageUrl
 import com.esgomez.rickandmorty.utils.bindingInflate
 import kotlinx.android.synthetic.main.item_grid_favorite_character.view.*
 

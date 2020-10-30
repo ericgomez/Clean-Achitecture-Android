@@ -15,6 +15,7 @@ import com.esgomez.rickandmorty.data.*
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterRoomDataSource
 import com.esgomez.rickandmorty.domain.Character
+import com.esgomez.rickandmorty.imagemanager.bindCircularImageUrl
 import com.esgomez.rickandmorty.parcelable.CharacterParcelable
 import com.esgomez.rickandmorty.parcelable.toCharacterDomain
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation
@@ -25,7 +26,6 @@ import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
 import com.esgomez.rickandmorty.usecases.UpdateFavoriteCharacterStatusUseCase
 import com.esgomez.rickandmorty.utils.Constants
-import com.esgomez.rickandmorty.utils.bindCircularImageUrl
 import com.esgomez.rickandmorty.utils.getViewModel
 import com.esgomez.rickandmorty.utils.showLongToast
 import kotlinx.android.synthetic.main.activity_character_detail.*

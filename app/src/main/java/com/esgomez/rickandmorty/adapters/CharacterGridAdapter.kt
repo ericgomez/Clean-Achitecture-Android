@@ -4,9 +4,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.databinding.ItemGridCharacterBinding
-import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.domain.Character
-import com.esgomez.rickandmorty.utils.bindImageUrl
+import com.esgomez.rickandmorty.imagemanager.bindImageUrl
 import com.esgomez.rickandmorty.utils.bindingInflate
 import kotlinx.android.synthetic.main.item_grid_character.view.*
 
