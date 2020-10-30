@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.CharacterGridAdapter
-import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
-import com.esgomez.rickandmorty.api.CharacterRequest
-import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
+import com.esgomez.rickandmorty.requestmanager.APIConstants.BASE_API_URL
+import com.esgomez.rickandmorty.requestmanager.CharacterRequest
+import com.esgomez.rickandmorty.requestmanager.CharacterRetrofitDataSource
 import com.esgomez.rickandmorty.data.CharacterRepository
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
 import com.esgomez.rickandmorty.data.RemoteCharacterDataSource

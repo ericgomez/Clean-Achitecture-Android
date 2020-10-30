@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.FavoriteListAdapter
-import com.esgomez.rickandmorty.api.APIConstants
-import com.esgomez.rickandmorty.api.CharacterRequest
-import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
+import com.esgomez.rickandmorty.requestmanager.APIConstants
+import com.esgomez.rickandmorty.requestmanager.CharacterRequest
+import com.esgomez.rickandmorty.requestmanager.CharacterRetrofitDataSource
 import com.esgomez.rickandmorty.data.CharacterRepository
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
 import com.esgomez.rickandmorty.data.RemoteCharacterDataSource

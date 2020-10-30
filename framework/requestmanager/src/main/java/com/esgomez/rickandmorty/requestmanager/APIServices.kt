@@ -1,6 +1,6 @@
-package com.esgomez.rickandmorty.api
+package com.esgomez.rickandmorty.requestmanager
 
-import com.esgomez.rickandmorty.api.APIConstants.ENDPOINT_CHARACTER
+import com.esgomez.rickandmorty.requestmanager.APIConstants.ENDPOINT_CHARACTER
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

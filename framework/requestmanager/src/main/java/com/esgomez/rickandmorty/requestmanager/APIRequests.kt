@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.api
+package com.esgomez.rickandmorty.requestmanager
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

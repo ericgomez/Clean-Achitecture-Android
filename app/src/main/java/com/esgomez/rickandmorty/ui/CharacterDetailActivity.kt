@@ -9,8 +9,7 @@ import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.databinding.ActivityCharacterDetailBinding
 import com.esgomez.rickandmorty.adapters.EpisodeListAdapter
-import com.esgomez.rickandmorty.api.*
-import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
+import com.esgomez.rickandmorty.requestmanager.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.data.*
 import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
 import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
@@ -22,6 +21,10 @@ import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterD
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation.*
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel
+import com.esgomez.rickandmorty.requestmanager.CharacterRequest
+import com.esgomez.rickandmorty.requestmanager.CharacterRetrofitDataSource
+import com.esgomez.rickandmorty.requestmanager.EpisodeRequest
+import com.esgomez.rickandmorty.requestmanager.EpisodeRetrofitDataSource
 import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
 import com.esgomez.rickandmorty.usecases.UpdateFavoriteCharacterStatusUseCase

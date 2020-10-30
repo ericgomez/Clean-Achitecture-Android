@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.api
+package com.esgomez.rickandmorty.requestmanager
 
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.domain.Episode

@@ -59,6 +59,8 @@ dependencies {
     implementation project(":framework:imagemanager")
     //Agregamos el proyecto framework:imagemanager al proyecto
     implementation project(":framework:databasemanager")
+    //Agregamos el proyecto framework:imagemanager al proyecto
+    implementation project(":framework:requestmanager")
 
     //Kotlin
     implementation kotlinLib
@@ -68,11 +70,6 @@ dependencies {
 
     //Material
     implementation materialLib
-
-    //Retrofit
-    implementation okHttpInterceptorLib
-    implementation retrofitRxJavaLib
-    implementation retrofitGsonLib
 
     implementation reactiveStreamsLib
 

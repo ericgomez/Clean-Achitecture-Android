@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.api
+package com.esgomez.rickandmorty.requestmanager
 
 object APIConstants {
     const val BASE_API_URL = "https://rickandmortyapi.com/api/"
