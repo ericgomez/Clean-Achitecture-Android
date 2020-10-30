@@ -12,8 +12,8 @@ import com.esgomez.rickandmorty.adapters.EpisodeListAdapter
 import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.data.*
-import com.esgomez.rickandmorty.database.CharacterDatabase
-import com.esgomez.rickandmorty.database.CharacterRoomDataSource
+import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
+import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.imagemanager.bindCircularImageUrl
 import com.esgomez.rickandmorty.parcelable.CharacterParcelable

@@ -1,7 +1,6 @@
-package com.esgomez.rickandmorty.database
+package com.esgomez.rickandmorty.databasemanager
 
 import androidx.room.*
-import com.esgomez.rickandmorty.database.CharacterEntity
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 

@@ -55,17 +55,16 @@ dependencies {
     implementation project(":data")
     //Agregamos el proyecto usecases al proyecto
     implementation project(":usecases")
-    //Agregamos el proyecto usecases al proyecto
+    //Agregamos el proyecto framework:imagemanager al proyecto
     implementation project(":framework:imagemanager")
+    //Agregamos el proyecto framework:imagemanager al proyecto
+    implementation project(":framework:databasemanager")
 
     //Kotlin
     implementation kotlinLib
 
     //KTX
     implementation ktxLib
-
-    //Gson
-    implementation gsonLib
 
     //Material
     implementation materialLib
@@ -74,11 +73,6 @@ dependencies {
     implementation okHttpInterceptorLib
     implementation retrofitRxJavaLib
     implementation retrofitGsonLib
-
-    //Room
-    api roomLib
-    kapt roomCompiler
-    implementation roomRxJavaLib
 
     implementation reactiveStreamsLib
 

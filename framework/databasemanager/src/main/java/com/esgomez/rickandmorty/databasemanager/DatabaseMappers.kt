@@ -1,8 +1,8 @@
-package com.esgomez.rickandmorty.database
+package com.esgomez.rickandmorty.databasemanager
 
-import com.esgomez.rickandmorty.api.CharacterServer
-import com.esgomez.rickandmorty.api.LocationServer
-import com.esgomez.rickandmorty.api.OriginServer
+import com.esgomez.rickandmorty.databasemanager.CharacterEntity
+import com.esgomez.rickandmorty.databasemanager.LocationEntity
+import com.esgomez.rickandmorty.databasemanager.OriginEntity
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.domain.Location
 import com.esgomez.rickandmorty.domain.Origin

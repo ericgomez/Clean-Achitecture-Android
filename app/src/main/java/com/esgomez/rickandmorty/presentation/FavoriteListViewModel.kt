@@ -4,13 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.esgomez.rickandmorty.database.CharacterDao
-import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetAllFavoriteCharactersUseCase
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 
 class FavoriteListViewModel (private val getAllFavoriteCharactersUseCase: GetAllFavoriteCharactersUseCase) : ViewModel() {
 

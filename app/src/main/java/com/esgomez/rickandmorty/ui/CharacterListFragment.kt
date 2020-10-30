@@ -15,12 +15,11 @@ import com.esgomez.rickandmorty.adapters.CharacterGridAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.api.CharacterRequest
 import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
-import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.data.CharacterRepository
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
 import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
-import com.esgomez.rickandmorty.database.CharacterDatabase
-import com.esgomez.rickandmorty.database.CharacterRoomDataSource
+import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
+import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel
@@ -28,7 +27,6 @@ import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterLis
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation.*
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
-import com.esgomez.rickandmorty.utils.getViewModel
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import com.esgomez.rickandmorty.utils.showLongToast
 import kotlinx.android.synthetic.main.fragment_character_list.*

@@ -3,7 +3,6 @@ package com.esgomez.rickandmorty.adapters
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.esgomez.rickandmorty.R
-import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.databinding.ItemGridFavoriteCharacterBinding
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.imagemanager.bindImageUrl

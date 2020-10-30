@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.database
+package com.esgomez.rickandmorty.databasemanager
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

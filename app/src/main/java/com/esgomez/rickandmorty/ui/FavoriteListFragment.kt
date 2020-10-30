@@ -17,10 +17,8 @@ import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
 import com.esgomez.rickandmorty.data.CharacterRepository
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
 import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
-import com.esgomez.rickandmorty.database.CharacterDao
-import com.esgomez.rickandmorty.database.CharacterDatabase
-import com.esgomez.rickandmorty.database.CharacterEntity
-import com.esgomez.rickandmorty.database.CharacterRoomDataSource
+import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
+import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
 import com.esgomez.rickandmorty.databinding.FragmentFavoriteListBinding
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel
@@ -28,7 +26,6 @@ import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListN
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation.ShowCharacterList
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation.ShowEmptyListMessage
 import com.esgomez.rickandmorty.presentation.utils.Event
-import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
 import com.esgomez.rickandmorty.usecases.GetAllFavoriteCharactersUseCase
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import kotlinx.android.synthetic.main.fragment_favorite_list.*

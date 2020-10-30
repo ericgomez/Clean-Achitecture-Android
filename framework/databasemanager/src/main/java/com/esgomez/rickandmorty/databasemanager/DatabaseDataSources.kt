@@ -1,4 +1,4 @@
-package com.esgomez.rickandmorty.database
+package com.esgomez.rickandmorty.databasemanager
 
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
 import com.esgomez.rickandmorty.domain.Character
