@@ -7,9 +7,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.esgomez.rickandmorty.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.esgomez.rickandmorty.adapters.HomeNavigationStateAdapter
-import com.esgomez.rickandmorty.api.CharacterServer
-import com.esgomez.rickandmorty.database.CharacterEntity
-import com.esgomez.rickandmorty.database.toCharacterServer
+import com.esgomez.rickandmorty.domain.Character
+import com.esgomez.rickandmorty.parcelable.toCharacterParcelable
 import com.esgomez.rickandmorty.utils.Constants
 import com.esgomez.rickandmorty.utils.startActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -64,16 +63,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
-    override fun openCharacterDetail(character: CharacterEntity) {
+    override fun openCharacterDetail(character: Character) {
         startActivity<CharacterDetailActivity> {
-            putExtra(Constants.EXTRA_CHARACTER, character.toCharacterServer())
-        }
-        overridePendingTransition(R.anim.entry, R.anim.exit)
-    }
-
-    override fun openCharacterDetail(character: CharacterServer) {
-        startActivity<CharacterDetailActivity> {
-            putExtra(Constants.EXTRA_CHARACTER, character)
+            putExtra(Constants.EXTRA_CHARACTER, character.toCharacterParcelable())
         }
         overridePendingTransition(R.anim.entry, R.anim.exit)
     }

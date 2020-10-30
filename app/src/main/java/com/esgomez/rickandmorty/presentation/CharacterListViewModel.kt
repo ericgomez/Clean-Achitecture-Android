@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.esgomez.rickandmorty.api.*
+import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
 import io.reactivex.disposables.CompositeDisposable
@@ -92,7 +93,7 @@ class CharacterListViewModel (private val getAllCharactersUseCase: GetAllCharact
     sealed class CharacterListNavigation {
         //Como devuelven parametros son de tipo data class
         data class ShowCharacterError(val error: Throwable) : CharacterListNavigation()//Se va a utilizar en caso de que aya un error al momento de obtener la lista
-        data class ShowCharacterList(val characterList: List<CharacterServer>) : CharacterListNavigation()//Devolver la lista de personajes
+        data class ShowCharacterList(val characterList: List<Character>) : CharacterListNavigation()//Devolver la lista de personajes
         //los siguientes elemento no necesitan manejar ningun tipo de parametros por lo que los declararemos como object
         object HideLoading : CharacterListNavigation()//Indica cuando se oculte el proceso de carga de la aplicacion
         object ShowLoading: CharacterListNavigation()////Indica cuando se muestre el proceso de carga de la aplicacion

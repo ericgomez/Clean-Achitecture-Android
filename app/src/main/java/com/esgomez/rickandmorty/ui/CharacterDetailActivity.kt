@@ -14,6 +14,9 @@ import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.api.EpisodeRequest
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
+import com.esgomez.rickandmorty.domain.Character
+import com.esgomez.rickandmorty.parcelable.CharacterParcelable
+import com.esgomez.rickandmorty.parcelable.toCharacterDomain
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation
 import com.esgomez.rickandmorty.presentation.CharacterDetailViewModel.CharacterDetailNavigation.*
 import com.esgomez.rickandmorty.presentation.utils.Event
@@ -63,7 +66,7 @@ class CharacterDetailActivity: AppCompatActivity() {
         getViewModel {
             CharacterDetailViewModel(
                 //Paso 22: Agregar parámetro "intent.getParcelableExtra(Constants.EXTRA_CHARACTER)"
-                intent.getParcelableExtra(Constants.EXTRA_CHARACTER),
+                intent.getParcelableExtra<CharacterParcelable>(Constants.EXTRA_CHARACTER)?.toCharacterDomain(),
                 //Paso 23: Agregar parámetro "characterDao"
                 //Paso 24: Agregar la funcion que contiene el metodo get de "episodeRequest"
                 getEpisodeFromCharacterUseCase,
@@ -118,7 +121,7 @@ class CharacterDetailActivity: AppCompatActivity() {
     //region Private Methods
 
     //Paso 41: Inicializar los valores de la variable "binding" utilizando de referencia el paso 30
-    private fun loadCharacter(character: CharacterServer){
+    private fun loadCharacter(character: Character){
         binding.characterImage.bindCircularImageUrl(
             url = character!!.image,
             placeholder = R.drawable.ic_camera_alt_black,

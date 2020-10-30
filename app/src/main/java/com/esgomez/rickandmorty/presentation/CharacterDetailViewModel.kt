@@ -4,8 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.esgomez.rickandmorty.api.*
-import com.esgomez.rickandmorty.database.CharacterDao
-import com.esgomez.rickandmorty.database.CharacterEntity
+import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetEpisodeFromCharacterUseCase
 import com.esgomez.rickandmorty.usecases.GetFavoriteCharacterStatusUseCase
@@ -14,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 
 // Paso 1: Pasar como parámetros "character" de tipo CharacterServer?, "characterDao" de tipo CharacterDao y "episodeRequest" de tipo EpisodeRequest
 class CharacterDetailViewModel(
-    private val character: CharacterServer? = null,
+    private val character: Character? = null,
     private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase,
     private val getFavoriteCharacterStatusUseCase: GetFavoriteCharacterStatusUseCase,
     private val updateFavoriteCharacterStatusUseCase: UpdateFavoriteCharacterStatusUseCase
@@ -25,8 +24,8 @@ class CharacterDetailViewModel(
     //Paso 2: Declarar la variable "disposable" de tipo CompositeDisposable
     private val disposable = CompositeDisposable()
     //Paso 3: Crear las variables de tipo MutableLiveData y LiveData para manejar los valores del personaje (tipo sugerido: CharacterServer)
-    private val _characterValues = MutableLiveData<CharacterServer>()//Creamos su valor privado
-    val characterValues: LiveData<CharacterServer> get() = _characterValues//Creamos su valor publico que recivira el privado
+    private val _characterValues = MutableLiveData<Character>()//Creamos su valor privado
+    val characterValues: LiveData<Character> get() = _characterValues//Creamos su valor publico que recivira el privado
     //Paso 4: Crear las variables de tipo MutableLiveData y LiveData para manejar el estado de favorito de un personaje (tipo sugerido: Boolean)
     private val _isFavorite = MutableLiveData<Boolean>()//Creamos su valor privado
     val isFavorite: LiveData<Boolean> get() = _isFavorite//Creamos su valor publico que recivira el privado
@@ -63,10 +62,9 @@ class CharacterDetailViewModel(
     }
 
     fun onUpdateFavoriteCharacterStatus() {
-        val characterEntity: CharacterEntity = character!!.toCharacterEntity()
         disposable.add(
             updateFavoriteCharacterStatusUseCase//Implementar variable "updateFavoriteCharacterStatusUseCase"
-                .invoke(characterEntity)//Pasar la variable "characterEntity" al método "invoke" del caso de uso
+                .invoke(character!!)//Pasar la variable "characterEntity" al método "invoke" del caso de uso
                 .subscribe { isFavorite ->
                     //Paso 11: Disparar la variable de tipo MutableLiveData que se implementó en el Paso 3 con la variable "isFavorite"
                     _isFavorite.value = isFavorite//Devuelve la peticion

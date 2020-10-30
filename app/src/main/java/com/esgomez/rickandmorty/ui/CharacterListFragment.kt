@@ -16,6 +16,7 @@ import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.api.CharacterRequest
 import com.esgomez.rickandmorty.api.CharacterServer
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
+import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation.*
@@ -145,7 +146,7 @@ class CharacterListFragment : Fragment() {
     //region Inner Classes & Interfaces
 
     interface OnCharacterListFragmentListener {
-        fun openCharacterDetail(character: CharacterServer)
+        fun openCharacterDetail(character: Character)
     }
 
     //endregion

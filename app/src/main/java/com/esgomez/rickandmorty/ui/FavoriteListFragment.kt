@@ -16,6 +16,7 @@ import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterEntity
 import com.esgomez.rickandmorty.databinding.FragmentFavoriteListBinding
+import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation
 import com.esgomez.rickandmorty.presentation.FavoriteListViewModel.FavoriteListNavigation.ShowCharacterList
@@ -121,7 +122,7 @@ class FavoriteListFragment : Fragment() {
     //region Inner Classes & Interfaces
 
     interface OnFavoriteListFragmentListener {
-        fun openCharacterDetail(character: CharacterEntity)
+        fun openCharacterDetail(character: Character)
     }
 
     //endregion
