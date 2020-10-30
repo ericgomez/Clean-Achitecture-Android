@@ -14,7 +14,10 @@ import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.adapters.CharacterGridAdapter
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
 import com.esgomez.rickandmorty.api.CharacterRequest
+import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
 import com.esgomez.rickandmorty.api.CharacterServer
+import com.esgomez.rickandmorty.data.CharacterRepository
+import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel
@@ -39,8 +42,19 @@ class CharacterListFragment : Fragment() {
         CharacterRequest(BASE_API_URL)
     }
 
+    private val remoteCharacterDataSource: RemoteCharacterDataSource by lazy {
+        //Este metodo implementa la variable characterRequest
+        CharacterRetrofitDataSource(characterRequest)
+    }
+
+    private val characterRepository: CharacterRepository by lazy {
+        //Este metodo implementa la variable remoteCharacterDataSource
+        CharacterRepository(remoteCharacterDataSource)
+    }
+
     private val getAllCharacterUseCase: GetAllCharactersUseCase by lazy {
-        GetAllCharactersUseCase(characterRequest)
+        //Este metodo implementa la variable characterRepository
+        GetAllCharactersUseCase(characterRepository)
     }
 
     //Intanciamos la clase CharacterListViewModel
