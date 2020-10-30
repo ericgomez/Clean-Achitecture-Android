@@ -9,14 +9,9 @@ import androidx.lifecycle.Observer
 import com.esgomez.rickandmorty.R
 import com.esgomez.rickandmorty.databinding.ActivityCharacterDetailBinding
 import com.esgomez.rickandmorty.adapters.EpisodeListAdapter
+import com.esgomez.rickandmorty.api.*
 import com.esgomez.rickandmorty.api.APIConstants.BASE_API_URL
-import com.esgomez.rickandmorty.api.CharacterRequest
-import com.esgomez.rickandmorty.api.CharacterRetrofitDataSource
-import com.esgomez.rickandmorty.api.CharacterServer
-import com.esgomez.rickandmorty.api.EpisodeRequest
-import com.esgomez.rickandmorty.data.CharacterRepository
-import com.esgomez.rickandmorty.data.LocalCharacterDataSource
-import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
+import com.esgomez.rickandmorty.data.*
 import com.esgomez.rickandmorty.database.CharacterDao
 import com.esgomez.rickandmorty.database.CharacterDatabase
 import com.esgomez.rickandmorty.database.CharacterRoomDataSource
@@ -63,8 +58,21 @@ class CharacterDetailActivity: AppCompatActivity() {
         CharacterRepository(remoteCharacterDataSource, localCharacterDataSource)
     }
 
+    //Paso 8: Crear variable "remoteEpisodeDataSource" de tipo RemoteEpisodeDataSource
+    //Paso 8.1: Inicializar variable con una instancia de la clase "EpisodeRetrofitDataSource"
+    private val remoteEpisodeDataSource: RemoteEpisodeDataSource by lazy {
+        EpisodeRetrofitDataSource(episodeRequest)
+    }
+
+    //Paso 9: Crear variable "episodeRepository" de tipo EpisodeRepository
+    //Paso 9.1: Inicializar variable con una instancia de la clase "EpisodeRepository"
+    private val episodeRepository: EpisodeRepository by  lazy {
+        EpisodeRepository(remoteEpisodeDataSource)
+    }
+
+    //Paso 10: Pasar como parámetro la variable "episodeRepository" en la implementación del caso de uso "getEpisodeFromCharacterUseCase"
     private val getEpisodeFromCharacterUseCase: GetEpisodeFromCharacterUseCase by lazy {
-        GetEpisodeFromCharacterUseCase(episodeRequest)//Generamos la instancia de GetEpisodeFromCharacterUseCase y le enviamos episodeRequest
+        GetEpisodeFromCharacterUseCase(episodeRepository)//Generamos la instancia de GetEpisodeFromCharacterUseCase y le enviamos episodeRequest
     }
 
     //Paso 12: Crear la variable getFavoriteCharacterStatusUseCase de tipo GetFavoriteCharacterStatusUseCase usando la función lazy
