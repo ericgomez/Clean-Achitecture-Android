@@ -62,6 +62,10 @@ dependencies {
     //Agregamos el proyecto framework:imagemanager al proyecto
     implementation project(":framework:requestmanager")
 
+    //Dagger
+    implementation daggerLib
+    kapt daggerCompiler
+
     //Kotlin
     implementation kotlinLib
 

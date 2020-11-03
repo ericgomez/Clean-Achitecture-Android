@@ -21,12 +21,16 @@ import com.esgomez.rickandmorty.data.RemoteCharacterDataSource
 import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
 import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
 import com.esgomez.rickandmorty.databinding.FragmentCharacterListBinding
+import com.esgomez.rickandmorty.di.CharacterListComponent
+import com.esgomez.rickandmorty.di.CharacterListModule
 import com.esgomez.rickandmorty.domain.Character
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation
 import com.esgomez.rickandmorty.presentation.CharacterListViewModel.CharacterListNavigation.*
 import com.esgomez.rickandmorty.presentation.utils.Event
 import com.esgomez.rickandmorty.usecases.GetAllCharactersUseCase
+import com.esgomez.rickandmorty.utils.app
+import com.esgomez.rickandmorty.utils.getViewModel
 import com.esgomez.rickandmorty.utils.setItemDecorationSpacing
 import com.esgomez.rickandmorty.utils.showLongToast
 import kotlinx.android.synthetic.main.fragment_character_list.*
@@ -39,32 +43,11 @@ class CharacterListFragment : Fragment() {
     private lateinit var characterGridAdapter: CharacterGridAdapter
     private lateinit var listener: OnCharacterListFragmentListener
 
-    private val characterRequest: CharacterRequest by lazy {
-        CharacterRequest(BASE_API_URL)
-    }
-
-    private val localCharacterDataSource: LocalCharacterDataSource by lazy {
-        CharacterRoomDataSource(CharacterDatabase.getDatabase(activity!!.applicationContext))
-    }
-
-    private val remoteCharacterDataSource: RemoteCharacterDataSource by lazy {
-        //Este metodo implementa la variable characterRequest
-        CharacterRetrofitDataSource(characterRequest)
-    }
-
-    private val characterRepository: CharacterRepository by lazy {
-        //Este metodo implementa la variable remoteCharacterDataSource
-        CharacterRepository(remoteCharacterDataSource, localCharacterDataSource)
-    }
-
-    private val getAllCharacterUseCase: GetAllCharactersUseCase by lazy {
-        //Este metodo implementa la variable characterRepository
-        GetAllCharactersUseCase(characterRepository)
-    }
+    private lateinit var characterListComponent: CharacterListComponent
 
     //Intanciamos la clase CharacterListViewModel
     private val characterListViewModel: CharacterListViewModel by lazy {//Lo inicalizamos como tipo lazy
-        CharacterListViewModel(getAllCharacterUseCase)
+        getViewModel { characterListComponent.characterListViewModel }
     }
 
     private val onScrollListener: RecyclerView.OnScrollListener by lazy {
@@ -93,6 +76,11 @@ class CharacterListFragment : Fragment() {
         }catch (e: ClassCastException){
             throw ClassCastException("$context must implement OnCharacterListFragmentListener")
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        characterListComponent = context!!.app.component.inject(CharacterListModule())
     }
 
     override fun onCreateView(
