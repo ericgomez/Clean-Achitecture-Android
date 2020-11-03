@@ -1,6 +1,9 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+
 }
 
 android {
@@ -36,6 +39,10 @@ dependencies {
     implementation project(":domain")
 
     implementation kotlinLib
+
+    //Dagger
+    implementation daggerLib
+    kapt daggerCompiler
 
     implementation rxJavaLib
 }
