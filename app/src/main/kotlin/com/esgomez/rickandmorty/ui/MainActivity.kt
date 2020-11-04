@@ -8,9 +8,9 @@ import com.esgomez.rickandmorty.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.esgomez.rickandmorty.adapters.HomeNavigationStateAdapter
 import com.esgomez.rickandmorty.domain.Character
-import com.esgomez.rickandmorty.parcelable.toCharacterParcelable
 import com.esgomez.rickandmorty.utils.Constants
 import com.esgomez.rickandmorty.utils.startActivity
+import com.esgomez.rickandmorty.parcelables.toCharacterParcelable
 import kotlinx.android.synthetic.main.activity_main.*
 
 

@@ -7,9 +7,14 @@ import com.esgomez.rickandmorty.di.RickAndMortyComponent
 
 class RickAndMortyApp: Application() {
 
-    //region Override Methods & Callbacks
+    //region Fields
 
     lateinit var component: RickAndMortyComponent
+        private set
+
+    //endregion
+
+    //region Override Methods & Callbacks
 
     override fun onCreate() {
         super.onCreate()
@@ -21,6 +26,9 @@ class RickAndMortyApp: Application() {
 
     //endregion
 
+    //region Private Methods
+
     private fun initAppComponent() = DaggerRickAndMortyComponent.factory().create(this)
 
+    //endregion
 }

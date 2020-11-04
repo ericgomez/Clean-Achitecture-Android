@@ -1,7 +1,9 @@
-package com.esgomez.rickandmorty.databasemanager
+package com.esgomez.rickandmorty.databasemanager.di
 
 import android.app.Application
 import com.esgomez.rickandmorty.data.LocalCharacterDataSource
+import com.esgomez.rickandmorty.databasemanager.CharacterDatabase
+import com.esgomez.rickandmorty.databasemanager.CharacterRoomDataSource
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
